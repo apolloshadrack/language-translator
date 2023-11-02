@@ -1,23 +1,37 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import './App.css';
 
 function App() {
+  const [isListening, setIsListening] = useState(false);
+  const { finalTranscript, interimTranscript, resetTranscript } = useSpeechRecognition();
+
+  const handleButtonClick = () => {
+    if (isListening) {
+      SpeechRecognition.stopListening();
+    } else {
+      SpeechRecognition.startListening({ continuous: true, language: 'en-US' });
+    }
+
+    setIsListening(!isListening);
+  };
+
+  const handleResetClick = () => {
+    resetTranscript();
+  };
+
+  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    return null;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div class='translator'>
+      <button class='trigger' onClick={handleButtonClick}>
+        {isListening ? 'Stop Talking' : 'Start Talking'}
+      </button>
+      <button class='reset' onClick={handleResetClick}>Reset</button>
+      <p>{interimTranscript}</p>
+      <p>{finalTranscript}</p>
     </div>
   );
 }
